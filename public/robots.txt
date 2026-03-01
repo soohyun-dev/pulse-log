@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://yunsoohyun.github.io/pulse-log/sitemap.xml
+Sitemap: https://soohyun-dev.github.io/pulse-log/sitemap.xml

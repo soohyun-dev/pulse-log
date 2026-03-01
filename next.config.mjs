@@ -11,6 +11,7 @@ if (!process.env.VELITE_STARTED && (isDev || isBuild)) {
 const nextConfig = {
   output: 'export',
   basePath: '/pulse-log',
+  trailingSlash: true,
   images: {
     unoptimized: true,
   },
