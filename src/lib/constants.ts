@@ -8,8 +8,9 @@ export const siteConfig = {
   },
   giscus: {
     repo: 'yunsoohyun/pulse-log' as `${string}/${string}`,
-    repoId: '',
-    category: 'Announcements',
-    categoryId: '',
+    repoId: "R_kgDORbjmiw",
+    category: "Announcements",
+    categoryId: 'DIC_kwDORbjmi84C3czU',
   },
 }
+

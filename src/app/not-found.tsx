@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 export default function NotFound() {
   return (
-    <div className="mx-auto max-w-3xl px-6 py-24 text-center">
+    <div className="mx-auto max-w-4xl px-6 py-24 text-center">
       <h1 className="text-6xl font-bold text-muted-foreground mb-4">404</h1>
       <p className="text-lg text-muted-foreground mb-8">
         페이지를 찾을 수 없습니다.

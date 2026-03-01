@@ -27,11 +27,11 @@ export default async function TagPage({ params }: TagPageProps) {
   if (posts.length === 0) notFound()
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-12">
+    <div className="mx-auto max-w-5xl px-6 py-12">
       <h1 className="text-3xl font-bold mb-2">#{tag}</h1>
       <p className="text-muted-foreground mb-8">{posts.length}개의 글</p>
 
-      <div className="grid gap-4">
+      <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
         {posts.map((post) => (
           <PostCard
             key={post.slug}
@@ -40,6 +40,7 @@ export default async function TagPage({ params }: TagPageProps) {
             description={post.description}
             date={post.date}
             tags={post.tags}
+            thumbnail={post.thumbnail}
             metadata={post.metadata}
           />
         ))}

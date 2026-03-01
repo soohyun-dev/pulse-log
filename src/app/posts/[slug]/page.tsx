@@ -52,7 +52,7 @@ export default async function PostPage({ params }: PostPageProps) {
   const { prev, next } = getAdjacentPosts(slug)
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-12">
+    <div className="mx-auto max-w-4xl px-6 py-12">
       <div className="flex gap-0 xl:gap-0">
         <article className="flex-1 min-w-0">
           <header className="mb-8">

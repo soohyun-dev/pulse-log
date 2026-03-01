@@ -8,7 +8,7 @@ export default function HomePage() {
   const recentPosts = posts.slice(0, 6)
 
   return (
-    <div className="mx-auto max-w-3xl px-6">
+    <div className="mx-auto max-w-5xl px-6">
       <HeroSection />
 
       <section className="pb-16">
@@ -24,7 +24,7 @@ export default function HomePage() {
           )}
         </div>
 
-        <div className="grid gap-4">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {recentPosts.map((post) => (
             <PostCard
               key={post.slug}
@@ -33,6 +33,7 @@ export default function HomePage() {
               description={post.description}
               date={post.date}
               tags={post.tags}
+              thumbnail={post.thumbnail}
               metadata={post.metadata}
             />
           ))}
