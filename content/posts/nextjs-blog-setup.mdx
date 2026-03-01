@@ -1,0 +1,57 @@
+---
+title: "Next.js로 기술 블로그 만들기"
+description: "Next.js, Tailwind CSS, Velite를 사용해서 정적 블로그를 구축하는 과정을 정리합니다."
+date: "2026-03-01"
+tags: ["nextjs", "typescript", "tailwindcss", "blog"]
+draft: false
+---
+
+## 기술 스택 선택
+
+블로그를 만들기 위해 다음 기술 스택을 선택했습니다:
+
+| 항목 | 선택 | 이유 |
+|------|------|------|
+| 프레임워크 | Next.js | App Router + 정적 내보내기 |
+| 스타일링 | Tailwind CSS | 빠른 개발, 일관된 디자인 |
+| 콘텐츠 | Velite + MDX | 타입 안전, 빌드 타임 처리 |
+| 배포 | GitHub Pages | 무료, 자동 배포 |
+
+## 프로젝트 구조
+
+```bash
+pulselog/
+├── content/posts/    # MDX 블로그 글
+├── src/
+│   ├── app/          # Next.js App Router 페이지
+│   ├── components/   # 재사용 컴포넌트
+│   └── lib/          # 유틸리티 함수
+└── velite.config.ts  # 콘텐츠 처리 설정
+```
+
+## Velite로 MDX 처리하기
+
+Velite는 MDX 파일을 타입 안전하게 처리해주는 도구입니다.
+
+```typescript
+import { defineConfig, defineCollection, s } from 'velite'
+
+const posts = defineCollection({
+  name: 'Post',
+  pattern: 'posts/**/*.mdx',
+  schema: s.object({
+    title: s.string().max(120),
+    slug: s.path(),
+    description: s.string().max(300),
+    date: s.isodate(),
+    tags: s.array(s.string()).default([]),
+    body: s.mdx(),
+  }),
+})
+```
+
+빌드 타임에 모든 MDX가 처리되어 **런타임 비용이 제로**입니다.
+
+## 마무리
+
+다음 글에서는 마크다운 스타일링과 코드 하이라이팅 설정에 대해 더 자세히 다루겠습니다.
