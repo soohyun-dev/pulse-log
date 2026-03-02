@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "./mdx.css";
 @import "./code-theme.css";
+@import "./briefing.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 

@@ -4,9 +4,26 @@ interface TagBadgeProps {
   tag: string
   count?: number
   clickable?: boolean
+  briefing?: boolean
 }
 
-export function TagBadge({ tag, count, clickable = false }: TagBadgeProps) {
+export function TagBadge({ tag, count, clickable = false, briefing = false }: TagBadgeProps) {
+  if (briefing) {
+    if (clickable) {
+      return (
+        <Link href={`/tags/${tag.toLowerCase()}`} className="briefing-tag inline-flex items-center gap-1.5">
+          {tag.toUpperCase()}
+          {count !== undefined && <span className="opacity-50">{count}</span>}
+        </Link>
+      )
+    }
+    return (
+      <span className="briefing-tag-inline">
+        {tag}
+      </span>
+    )
+  }
+
   const className = "inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-accent/10 hover:text-accent"
 
   if (clickable) {

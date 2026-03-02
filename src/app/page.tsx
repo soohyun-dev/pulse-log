@@ -8,24 +8,28 @@ export default function HomePage() {
   const recentPosts = posts.slice(0, 6)
 
   return (
-    <div className="mx-auto max-w-[70rem] px-6">
+    <div className="briefing-scanlines mx-auto max-w-[70rem] px-6">
       <HeroSection />
+
+      <div className="briefing-divider mb-8" />
 
       <section className="pb-16">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold">최근 글</h2>
+          <h2 className="font-mono text-sm font-bold tracking-wider uppercase text-foreground/80">
+            Recent Intel
+          </h2>
           {posts.length > 6 && (
             <Link
               href="/posts"
-              className="text-sm text-muted-foreground hover:text-accent transition-colors"
+              className="font-mono text-[0.7rem] tracking-wider uppercase text-muted-foreground hover:text-amber-600 dark:hover:text-amber-400/80 transition-colors"
             >
-              전체 보기 &rarr;
+              View All &rarr;
             </Link>
           )}
         </div>
 
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {recentPosts.map((post) => (
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {recentPosts.map((post, i) => (
             <PostCard
               key={post.slug}
               slug={post.slug}
@@ -35,13 +39,14 @@ export default function HomePage() {
               tags={post.tags}
               thumbnail={post.thumbnail}
               metadata={post.metadata}
+              index={i}
             />
           ))}
         </div>
 
         {posts.length === 0 && (
-          <p className="text-center text-muted-foreground py-12">
-            아직 작성된 글이 없습니다.
+          <p className="text-center text-muted-foreground py-12 font-mono text-sm">
+            No intel available.
           </p>
         )}
       </section>
