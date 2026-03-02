@@ -7,7 +7,7 @@ import { ThemeToggle } from '@/components/theme/theme-toggle'
 import { MobileNav } from './mobile-nav'
 
 const navItems = [
-  { href: '/posts', label: 'Posts' },
+  { href: '/posts', label: 'Briefing' },
   { href: '/tags', label: 'Tags' },
   { href: '/about', label: 'About' },
 ]
@@ -18,14 +18,17 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-sm">
       <div className="mx-auto flex h-14 max-w-[70rem] items-center justify-between px-6">
-        <Link href="/" className="hover:opacity-80 transition-opacity">
+        <Link href="/" className="hover:opacity-80 transition-opacity flex items-center gap-3">
           <img
             src="/pulse-log/images/pulse_logo.png"
             alt={siteConfig.name}
-            width={40}
-            height={40}
+            width={32}
+            height={32}
             className="rounded-full"
           />
+          <span className="hidden sm:inline font-mono text-[0.7rem] tracking-[0.2em] uppercase text-muted-foreground">
+            Pulse Log
+          </span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">
@@ -33,7 +36,7 @@ export function Header() {
             <Link
               key={item.href}
               href={item.href}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="font-mono text-[0.7rem] tracking-[0.12em] uppercase text-muted-foreground hover:text-foreground transition-colors"
             >
               {item.label}
             </Link>
@@ -45,13 +48,13 @@ export function Header() {
             onClick={() => {
               document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))
             }}
-            className="hidden md:flex h-9 items-center gap-2 rounded-md border border-border px-3 text-sm text-muted-foreground hover:bg-muted transition-colors"
+            className="hidden md:flex h-8 items-center gap-2 rounded-sm border border-border px-3 font-mono text-[0.65rem] tracking-wider uppercase text-muted-foreground hover:bg-muted transition-colors"
             aria-label="검색"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="14"
-              height="14"
+              width="13"
+              height="13"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -62,15 +65,15 @@ export function Header() {
               <circle cx="11" cy="11" r="8" />
               <path d="m21 21-4.3-4.3" />
             </svg>
-            <span>검색...</span>
-            <kbd className="ml-2 rounded bg-muted px-1.5 py-0.5 text-xs font-mono">⌘K</kbd>
+            <span>Search</span>
+            <kbd className="ml-1 rounded-sm bg-muted px-1.5 py-0.5 text-[0.6rem] font-mono">⌘K</kbd>
           </button>
 
           <ThemeToggle />
 
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="flex md:hidden h-9 w-9 items-center justify-center rounded-md border border-border hover:bg-muted transition-colors"
+            className="flex md:hidden h-9 w-9 items-center justify-center rounded-sm border border-border hover:bg-muted transition-colors"
             aria-label="메뉴"
           >
             <svg

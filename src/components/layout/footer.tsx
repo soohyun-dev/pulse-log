@@ -5,14 +5,14 @@ export function Footer() {
   return (
     <footer className="border-t border-border">
       <div className="mx-auto flex max-w-[70rem] flex-col items-center gap-4 px-6 py-8 md:flex-row md:justify-between">
-        <p className="text-sm text-muted-foreground">
-          &copy; {new Date().getFullYear()} {siteConfig.name}. All rights reserved.
+        <p className="font-mono text-[0.65rem] tracking-[0.1em] uppercase text-muted-foreground">
+          &copy; {new Date().getFullYear()} {siteConfig.name} — All Rights Reserved
         </p>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-5">
           <Link
             href="/feed.xml"
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="font-mono text-[0.65rem] tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors"
             aria-label="RSS Feed"
           >
             RSS
@@ -26,8 +26,8 @@ export function Footer() {
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
+              width="16"
+              height="16"
               viewBox="0 0 24 24"
               fill="currentColor"
             >
