@@ -18,8 +18,14 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-sm">
       <div className="mx-auto flex h-14 max-w-[80rem] items-center justify-between px-6">
-        <Link href="/" className="text-lg font-bold hover:text-accent transition-colors">
-          {siteConfig.name}
+        <Link href="/" className="hover:opacity-80 transition-opacity">
+          <img
+            src="/pulse-log/images/pulse_logo.png"
+            alt={siteConfig.name}
+            width={40}
+            height={40}
+            className="rounded-full"
+          />
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">
