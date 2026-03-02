@@ -4,6 +4,7 @@ import { MDXContent } from '@/components/mdx/mdx-content'
 import { TableOfContents } from '@/components/toc/table-of-contents'
 import { GiscusComments } from '@/components/comments/giscus-comments'
 import { TagBadge } from '@/components/tags/tag-badge'
+import { formatDate } from '@/lib/utils'
 import { getAdjacentPosts } from '@/lib/posts'
 import { siteConfig } from '@/lib/constants'
 import { BriefingIntro, BriefingFadeIn } from '@/components/posts/briefing-intro'
@@ -66,23 +67,30 @@ export default async function PostPage({ params }: PostPageProps) {
         <div className="flex gap-0 xl:gap-0">
           <article className="flex-1 min-w-0">
             <header className="mb-8">
-              {/* Military-style meta line */}
+              {/* Light: original meta */}
               <BriefingFadeIn delay={1400}>
-                <div className="flex items-center gap-3 font-mono text-[0.65rem] tracking-wider uppercase text-neutral-500 mb-4">
+                <div className="dark:hidden flex items-center gap-2 text-sm text-muted-foreground mb-3">
+                  <time dateTime={post.date}>{formatDate(post.date)}</time>
+                  <span>&middot;</span>
+                  <span>{Math.ceil(post.metadata.readingTime)}분 읽기</span>
+                </div>
+              </BriefingFadeIn>
+
+              {/* Dark: military meta */}
+              <BriefingFadeIn delay={1400}>
+                <div className="hidden dark:flex items-center gap-3 font-mono text-[0.65rem] tracking-wider uppercase text-muted-foreground mb-4">
                   <time dateTime={post.date}>{formatMilitaryDate(post.date)}</time>
-                  <span className="text-neutral-700">|</span>
+                  <span className="opacity-30">|</span>
                   <span>{Math.ceil(post.metadata.readingTime)} min read</span>
-                  <span className="text-neutral-700">|</span>
+                  <span className="opacity-30">|</span>
                   <span className="text-amber-500/50">Classified</span>
                 </div>
               </BriefingFadeIn>
 
-              {/* Title */}
               <BriefingFadeIn delay={1600}>
                 <h1 className="text-3xl font-bold mb-4">{post.title}</h1>
               </BriefingFadeIn>
 
-              {/* Tags */}
               {post.tags.length > 0 && (
                 <BriefingFadeIn delay={1800}>
                   <div className="flex flex-wrap gap-1.5">
@@ -93,13 +101,11 @@ export default async function PostPage({ params }: PostPageProps) {
                 </BriefingFadeIn>
               )}
 
-              {/* Divider */}
               <BriefingFadeIn delay={1900}>
-                <div className="briefing-divider mt-6" />
+                <div className="hidden dark:block briefing-divider mt-6" />
               </BriefingFadeIn>
             </header>
 
-            {/* Content */}
             <BriefingFadeIn delay={2000}>
               <MDXContent code={post.body} />
             </BriefingFadeIn>

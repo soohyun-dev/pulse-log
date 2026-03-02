@@ -1,10 +1,10 @@
 @layer components {
-  /* Scan line overlay - subtle CRT effect */
+  /* Scan line overlay - dark mode only */
   .briefing-scanlines {
     position: relative;
   }
 
-  .briefing-scanlines::before {
+  :where(.dark, .dark *) .briefing-scanlines::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -12,24 +12,14 @@
       0deg,
       transparent,
       transparent 2px,
-      rgba(0, 0, 0, 0.01) 2px,
-      rgba(0, 0, 0, 0.01) 4px
+      rgba(255, 255, 255, 0.008) 2px,
+      rgba(255, 255, 255, 0.008) 4px
     );
     pointer-events: none;
     z-index: 1;
   }
 
-  :where(.dark, .dark *) .briefing-scanlines::before {
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(255, 255, 255, 0.008) 2px,
-      rgba(255, 255, 255, 0.008) 4px
-    );
-  }
-
-  /* Flicker animation for title */
+  /* Flicker animation for title - dark mode only */
   @keyframes briefing-flicker {
     0%, 100% { opacity: 1; }
     92% { opacity: 1; }
@@ -43,12 +33,12 @@
     animation: briefing-flicker 5s infinite;
   }
 
-  /* Divider line with label */
+  /* Divider line with label - dark mode only */
   .briefing-divider {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    color: rgb(115 115 115 / 0.5);
+    color: rgb(163 163 163 / 0.4);
     font-family: var(--font-mono);
     font-size: 0.65rem;
     letter-spacing: 0.15em;
@@ -63,119 +53,73 @@
     background: linear-gradient(
       90deg,
       transparent,
-      rgb(115 115 115 / 0.2),
-      transparent
-    );
-  }
-
-  :where(.dark, .dark *) .briefing-divider {
-    color: rgb(163 163 163 / 0.4);
-  }
-
-  :where(.dark, .dark *) .briefing-divider::before,
-  :where(.dark, .dark *) .briefing-divider::after {
-    background: linear-gradient(
-      90deg,
-      transparent,
       rgb(163 163 163 / 0.15),
       transparent
     );
   }
 
-  /* Post card */
-  .briefing-card {
+  /* Post card - dark mode only */
+  :where(.dark, .dark *) .briefing-card {
     position: relative;
-    background: rgb(255 255 255 / 0.6);
+    background: rgb(0 0 0 / 0.35);
     backdrop-filter: blur(8px);
-    border: 1px solid rgb(0 0 0 / 0.08);
+    border: 1px solid rgb(255 255 255 / 0.06);
     transition: all 0.3s ease;
     overflow: hidden;
   }
 
-  .briefing-card::before {
+  :where(.dark, .dark *) .briefing-card::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     height: 2px;
-    background: linear-gradient(90deg, transparent, rgb(16 185 129 / 0.5), transparent);
+    background: linear-gradient(90deg, transparent, rgb(52 211 153 / 0.5), transparent);
     opacity: 0;
     transition: opacity 0.3s ease;
-  }
-
-  .briefing-card:hover {
-    border-color: rgb(16 185 129 / 0.25);
-    box-shadow: 0 4px 24px rgb(0 0 0 / 0.08);
-    transform: translateY(-2px);
-  }
-
-  .briefing-card:hover::before {
-    opacity: 1;
-  }
-
-  :where(.dark, .dark *) .briefing-card {
-    background: rgb(0 0 0 / 0.35);
-    border-color: rgb(255 255 255 / 0.06);
-  }
-
-  :where(.dark, .dark *) .briefing-card::before {
-    background: linear-gradient(90deg, transparent, rgb(52 211 153 / 0.5), transparent);
   }
 
   :where(.dark, .dark *) .briefing-card:hover {
     border-color: rgb(52 211 153 / 0.2);
     box-shadow: 0 4px 24px rgb(0 0 0 / 0.3);
+    transform: translateY(-2px);
   }
 
-  /* Tag filter style */
+  :where(.dark, .dark *) .briefing-card:hover::before {
+    opacity: 1;
+  }
+
+  /* Inline tag pill (inside card) - dark mode */
+  .briefing-tag-inline {
+    display: inline-flex;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.04em;
+    color: rgb(200 200 200 / 0.6);
+    background: rgb(255 255 255 / 0.08);
+    border: 1px solid rgb(255 255 255 / 0.06);
+    padding: 0.15rem 0.55rem;
+    border-radius: 9999px;
+  }
+
+  /* Tag filter style - dark mode */
   .briefing-tag {
     font-family: var(--font-mono);
     font-size: 0.68rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     padding: 0.25rem 0.65rem;
-    border: 1px solid rgb(0 0 0 / 0.1);
-    color: rgb(82 82 82 / 0.8);
-    background: rgb(0 0 0 / 0.03);
+    border: 1px solid rgb(255 255 255 / 0.08);
+    color: rgb(163 163 163 / 0.7);
+    background: rgb(255 255 255 / 0.03);
     transition: all 0.2s ease;
   }
 
   .briefing-tag:hover {
-    border-color: rgb(217 119 6 / 0.4);
-    color: rgb(180 83 9);
-    background: rgb(217 119 6 / 0.05);
-  }
-
-  :where(.dark, .dark *) .briefing-tag {
-    border-color: rgb(255 255 255 / 0.08);
-    color: rgb(163 163 163 / 0.7);
-    background: rgb(255 255 255 / 0.03);
-  }
-
-  :where(.dark, .dark *) .briefing-tag:hover {
     border-color: rgb(251 191 36 / 0.4);
     color: rgb(251 191 36 / 0.9);
     background: rgb(251 191 36 / 0.05);
-  }
-
-  /* Inline tag pill (inside card) */
-  .briefing-tag-inline {
-    display: inline-flex;
-    font-family: var(--font-mono);
-    font-size: 0.6rem;
-    letter-spacing: 0.04em;
-    color: rgb(82 82 82 / 0.7);
-    background: rgb(0 0 0 / 0.05);
-    border: 1px solid rgb(0 0 0 / 0.06);
-    padding: 0.15rem 0.55rem;
-    border-radius: 9999px;
-  }
-
-  :where(.dark, .dark *) .briefing-tag-inline {
-    color: rgb(200 200 200 / 0.6);
-    background: rgb(255 255 255 / 0.08);
-    border-color: rgb(255 255 255 / 0.06);
   }
 
   /* Scan sweep for intro overlay */

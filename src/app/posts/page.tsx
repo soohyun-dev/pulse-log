@@ -1,5 +1,7 @@
 import { PostCard } from '@/components/posts/post-card'
+import { TagBadge } from '@/components/tags/tag-badge'
 import { getPublishedPosts } from '@/lib/posts'
+import { getAllTags } from '@/lib/tags'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -20,11 +22,18 @@ function getMilitaryDate() {
 
 export default function PostsPage() {
   const posts = getPublishedPosts()
+  const tags = getAllTags()
 
   return (
     <div className="briefing-scanlines mx-auto max-w-[70rem] px-6 py-12">
-      {/* Briefing Header */}
-      <div className="mb-6">
+      {/* Light: original header */}
+      <div className="dark:hidden mb-8">
+        <h1 className="text-3xl font-bold mb-2">Posts</h1>
+        <p className="text-muted-foreground">총 {posts.length}개의 글</p>
+      </div>
+
+      {/* Dark: military header */}
+      <div className="hidden dark:block mb-6">
         <p className="font-mono text-[0.6rem] tracking-[0.3em] uppercase text-muted-foreground mb-1.5">
           Operation: Pulse Log
         </p>
@@ -40,11 +49,22 @@ export default function PostsPage() {
         </div>
       </div>
 
-      {/* Divider */}
-      <div className="briefing-divider mb-6" />
+      {/* Light: tag filter */}
+      {Object.keys(tags).length > 0 && (
+        <div className="dark:hidden flex flex-wrap gap-2 mb-8">
+          {Object.entries(tags)
+            .sort((a, b) => b[1] - a[1])
+            .map(([tag, count]) => (
+              <TagBadge key={tag} tag={tag} count={count} clickable />
+            ))}
+        </div>
+      )}
 
-      {/* Post Grid - 3 columns */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {/* Dark: divider */}
+      <div className="hidden dark:block briefing-divider mb-6" />
+
+      {/* Post Grid */}
+      <div className="grid grid-cols-1 gap-8 dark:gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {posts.map((post, i) => (
           <PostCard
             key={post.slug}
@@ -60,8 +80,8 @@ export default function PostsPage() {
         ))}
       </div>
 
-      {/* Bottom */}
-      <div className="mt-12">
+      {/* Dark: bottom decoration */}
+      <div className="hidden dark:block mt-12">
         <div className="briefing-divider">
           <span>End of Briefing</span>
         </div>
