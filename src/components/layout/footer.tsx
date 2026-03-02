@@ -4,7 +4,7 @@ import { siteConfig } from '@/lib/constants'
 export function Footer() {
   return (
     <footer className="border-t border-border">
-      <div className="mx-auto flex max-w-[80rem] flex-col items-center gap-4 px-6 py-8 md:flex-row md:justify-between">
+      <div className="mx-auto flex max-w-[70rem] flex-col items-center gap-4 px-6 py-8 md:flex-row md:justify-between">
         <p className="text-sm text-muted-foreground">
           &copy; {new Date().getFullYear()} {siteConfig.name}. All rights reserved.
         </p>

@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react'
 import { useTheme } from 'next-themes'
 
-const STAR_COUNT = 80
+const STAR_COUNT = 56
 const STAR_MIN_SIZE = 1
 const STAR_MAX_SIZE = 2.5
 const STAR_SPEED = 0.3

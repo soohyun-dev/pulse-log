@@ -8,7 +8,7 @@ export default function HomePage() {
   const recentPosts = posts.slice(0, 6)
 
   return (
-    <div className="mx-auto max-w-[80rem] px-6">
+    <div className="mx-auto max-w-[70rem] px-6">
       <HeroSection />
 
       <section className="pb-16">

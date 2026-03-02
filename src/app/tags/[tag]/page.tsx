@@ -27,7 +27,7 @@ export default async function TagPage({ params }: TagPageProps) {
   if (posts.length === 0) notFound()
 
   return (
-    <div className="mx-auto max-w-[80rem] px-6 py-12">
+    <div className="mx-auto max-w-[70rem] px-6 py-12">
       <h1 className="text-3xl font-bold mb-2">#{tag}</h1>
       <p className="text-muted-foreground mb-8">{posts.length}개의 글</p>
 
