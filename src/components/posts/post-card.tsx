@@ -26,7 +26,7 @@ export function PostCard({ slug, title, description, date, tags, thumbnail, meta
   return (
     <Link
       href={`/posts/${slug}`}
-      className="group block overflow-hidden rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+      className="group block overflow-hidden rounded-xl border border-transparent p-3 -m-3 transition-all duration-300 ease-out hover:scale-[1.02] hover:border-accent/50 hover:bg-accent/5"
     >
       <div className="aspect-[16/10] overflow-hidden rounded-xl">
         {thumbnail ? (
@@ -41,6 +41,14 @@ export function PostCard({ slug, title, description, date, tags, thumbnail, meta
       </div>
 
       <div className="flex flex-col gap-1.5 pt-4">
+        {tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {tags.map((tag) => (
+              <TagBadge key={tag} tag={tag} />
+            ))}
+          </div>
+        )}
+
         <h3 className="font-semibold leading-snug group-hover:text-accent transition-colors line-clamp-2">
           {title}
         </h3>
@@ -51,12 +59,6 @@ export function PostCard({ slug, title, description, date, tags, thumbnail, meta
 
         <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
           <time dateTime={date}>{formatDate(date)}</time>
-          {tags.length > 0 && (
-            <>
-              <span>&middot;</span>
-              <span className="text-accent">{tags[0]}</span>
-            </>
-          )}
         </div>
       </div>
     </Link>

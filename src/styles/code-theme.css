@@ -5,6 +5,7 @@
 
 [data-rehype-pretty-code-figure] pre {
   @apply overflow-x-auto rounded-lg border border-border py-4;
+  background-color: var(--color-muted) !important;
 }
 
 [data-rehype-pretty-code-figure] code {
@@ -36,6 +37,15 @@
 
 [data-rehype-pretty-code-title] + pre {
   @apply rounded-t-none;
+}
+
+/* Shiki dual theme: apply colors from CSS variables */
+[data-rehype-pretty-code-figure] code span {
+  color: var(--shiki-light);
+}
+
+.dark [data-rehype-pretty-code-figure] code span {
+  color: var(--shiki-dark);
 }
 
 /* Dual theme: show/hide based on dark mode class */

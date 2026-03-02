@@ -12,7 +12,7 @@ export default function TagsPage() {
   const sortedTags = Object.entries(tags).sort((a, b) => b[1] - a[1])
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-12">
+    <div className="mx-auto max-w-[70rem] px-6 py-12">
       <h1 className="text-3xl font-bold mb-2">Tags</h1>
       <p className="text-muted-foreground mb-8">총 {sortedTags.length}개의 태그</p>
 
