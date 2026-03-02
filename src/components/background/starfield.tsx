@@ -10,10 +10,11 @@ const STAR_SPEED = 0.3
 const MOUSE_RADIUS = 120
 const MOUSE_PUSH_FORCE = 2
 
-const NEBULA_COUNT = 4
+const NEBULA_COUNT = 2
 const NEBULA_SPEED = 0.08
 
-const MILKY_WAY_STAR_COUNT = 200
+const MILKY_WAY_CORE_STARS = 3200
+const MILKY_WAY_OUTER_STARS = 1280
 
 const SHOOTING_STAR_INTERVAL_MIN = 30000
 const SHOOTING_STAR_INTERVAL_MAX = 60000
@@ -50,9 +51,21 @@ interface Nebula {
 interface MilkyWayStar {
   offset: number
   spread: number
+  jitterX: number
+  jitterY: number
   size: number
   baseOpacity: number
   twinkleOffset: number
+  warm: number
+}
+
+interface MilkyWayConfig {
+  startX: number
+  startY: number
+  endX: number
+  endY: number
+  bandAngle: number
+  bandWidth: number
 }
 
 interface ShootingStar {
@@ -96,10 +109,12 @@ export function Starfield() {
     let stars: Star[] = []
     let nebulae: Nebula[] = []
     let milkyWayStars: MilkyWayStar[] = []
+    let mwConfig: MilkyWayConfig
+    let mwSide: 'left' | 'right'
+    let sunIntensity: number // 0 = 없음, 0~1 = 밝기
     let shootingStars: ShootingStar[] = []
     let nextShootingStarTime = Date.now() + 2000 + Math.random() * 3000
 
-    // 콘텐츠 영역 바깥 정도 (0 = 콘텐츠 안쪽, 1 = 완전히 바깥)
     function getOutsideFactor(x: number): number {
       const w = canvas!.width
       if (w <= CONTENT_MAX_WIDTH) return 0
@@ -121,7 +136,9 @@ export function Starfield() {
     }
 
     function createStars() {
-      stars = Array.from({ length: STAR_COUNT }, () => ({
+      const isMobile = canvas!.width < 1024
+      const count = isMobile ? Math.round(STAR_COUNT * 0.3) : STAR_COUNT
+      stars = Array.from({ length: count }, () => ({
         x: Math.random() * canvas!.width,
         y: Math.random() * canvas!.height,
         size: STAR_MIN_SIZE + Math.random() * (STAR_MAX_SIZE - STAR_MIN_SIZE),
@@ -140,12 +157,14 @@ export function Starfield() {
       const contentLeft = (w - CONTENT_MAX_WIDTH) / 2
       const contentRight = contentLeft + CONTENT_MAX_WIDTH
 
-      nebulae = Array.from({ length: NEBULA_COUNT }, (_, i) => {
+      // 은하수 반대쪽에만 성운 배치
+      const nebulaSide = mwSide === 'left' ? 'right' : 'left'
+
+      nebulae = Array.from({ length: NEBULA_COUNT }, () => {
         const color = NEBULA_COLORS[Math.floor(Math.random() * NEBULA_COLORS.length)]
-        const onLeft = i % 2 === 0
         const marginLeft = Math.max(contentLeft, 100)
         const marginRight = Math.max(w - contentRight, 100)
-        const x = onLeft
+        const x = nebulaSide === 'left'
           ? Math.random() * marginLeft
           : contentRight + Math.random() * marginRight
         return {
@@ -166,70 +185,208 @@ export function Starfield() {
     }
 
     function createMilkyWay() {
-      milkyWayStars = Array.from({ length: MILKY_WAY_STAR_COUNT }, () => ({
-        offset: Math.random(),
-        spread: (Math.random() - 0.5) * 2,
-        size: 0.3 + Math.random() * 1.2,
-        baseOpacity: 0.15 + Math.random() * 0.4,
-        twinkleOffset: Math.random() * Math.PI * 2,
-      }))
-    }
-
-    function drawMilkyWay(time: number) {
       const w = canvas!.width
       const h = canvas!.height
 
-      // 대각선 밴드: 왼쪽 위 → 오른쪽 아래
-      const startX = -w * 0.15
-      const startY = -h * 0.15
-      const endX = w * 1.15
-      const endY = h * 1.15
-      const bandWidth = 200
+      // 랜덤 위치/방향: 콘텐츠 바깥 한쪽에 배치
+      mwSide = Math.random() < 0.5 ? 'left' : 'right'
+      const side = mwSide
+      const contentLeft = (w - CONTENT_MAX_WIDTH) / 2
+      const contentRight = contentLeft + CONTENT_MAX_WIDTH
+      const centerX = side === 'left'
+        ? contentLeft * 0.5
+        : contentRight + (w - contentRight) * 0.5
 
-      // 은하수 글로우
-      const steps = 40
-      for (let i = 0; i < steps; i++) {
-        const t = i / steps
+      // 랜덤 각도 30~45° (방향 랜덤)
+      const sign = Math.random() < 0.5 ? 1 : -1
+      const angle = sign * (Math.PI / 6 + Math.random() * Math.PI / 12)
+      const length = h * (0.3 + Math.random() * 0.2)
+
+      // Y 위치 랜덤 (밴드가 화면 안에 들어오도록)
+      const margin = length * 0.3
+      const centerY = margin + Math.random() * (h - margin * 2)
+
+      const startX = centerX - Math.sin(angle) * length / 2
+      const startY = centerY - Math.cos(angle) * length / 2
+      const endX = centerX + Math.sin(angle) * length / 2
+      const endY = centerY + Math.cos(angle) * length / 2
+      const bandWidth = 80 + Math.random() * 60
+
+      // 태양: 40% 확률로 없음, 있으면 밝기 랜덤
+      sunIntensity = Math.random() < 0.4 ? 0 : 0.3 + Math.random() * 0.7
+
+      mwConfig = {
+        startX, startY, endX, endY,
+        bandAngle: Math.atan2(endY - startY, endX - startX) + Math.PI / 2,
+        bandWidth,
+      }
+
+      const totalStars = MILKY_WAY_CORE_STARS + MILKY_WAY_OUTER_STARS
+      milkyWayStars = Array.from({ length: totalStars }, (_, i) => {
+        const isCore = i < MILKY_WAY_CORE_STARS
+        // 가우시안-ish 분포: Box-Muller
+        const u1 = Math.random() || 0.001
+        const u2 = Math.random()
+        const gaussSpread = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2)
+        const spread = isCore
+          ? gaussSpread * 0.4  // 코어: 중심에 밀집
+          : gaussSpread * 1.2  // 외곽: 넓게 퍼짐
+
+        return {
+          offset: Math.random(),
+          spread,
+          jitterX: (Math.random() - 0.5) * 20,
+          jitterY: (Math.random() - 0.5) * 20,
+          size: isCore
+            ? 0.15 + Math.random() * 0.6
+            : 0.1 + Math.random() * 0.4,
+          baseOpacity: isCore
+            ? 0.15 + Math.random() * 0.35
+            : 0.08 + Math.random() * 0.2,
+          twinkleOffset: Math.random() * Math.PI * 2,
+          warm: isCore ? Math.exp(-spread * spread * 4) : 0,
+        }
+      })
+    }
+
+    function drawMilkyWay(time: number) {
+      const { startX, startY, endX, endY, bandAngle, bandWidth } = mwConfig
+
+      // 1) 은은한 외곽 글로우
+      const outerSteps = 30
+      for (let i = 0; i < outerSteps; i++) {
+        const t = i / outerSteps
         const cx = startX + (endX - startX) * t
         const cy = startY + (endY - startY) * t
 
         const outside = getOutsideFactor(cx)
         if (outside < 0.05) continue
 
-        const glowOpacity = 0.04 * outside
-        const grad = ctx!.createRadialGradient(cx, cy, 0, cx, cy, bandWidth)
-        grad.addColorStop(0, `rgba(120, 140, 200, ${glowOpacity})`)
-        grad.addColorStop(0.4, `rgba(100, 120, 180, ${glowOpacity * 0.5})`)
-        grad.addColorStop(1, 'rgba(100, 120, 180, 0)')
+        // 양 끝은 페이드아웃
+        const edgeFade = Math.sin(t * Math.PI)
+        const o = 0.025 * outside * edgeFade
+
+        const grad = ctx!.createRadialGradient(cx, cy, 0, cx, cy, bandWidth * 2.5)
+        grad.addColorStop(0, `rgba(100, 115, 170, ${o})`)
+        grad.addColorStop(0.5, `rgba(80, 100, 150, ${o * 0.3})`)
+        grad.addColorStop(1, 'rgba(80, 100, 150, 0)')
 
         ctx!.beginPath()
-        ctx!.arc(cx, cy, bandWidth, 0, Math.PI * 2)
+        ctx!.arc(cx, cy, bandWidth * 2.5, 0, Math.PI * 2)
         ctx!.fillStyle = grad
         ctx!.fill()
       }
 
-      // 은하수 별들
-      const bandAngle = Math.atan2(endY - startY, endX - startX) + Math.PI / 2
+      // 2) 따뜻한 코어 글로우 (중앙부만)
+      const coreSteps = 20
+      for (let i = 0; i < coreSteps; i++) {
+        const t = 0.3 + (i / coreSteps) * 0.4 // 밴드 중앙 40%만
+        const cx = startX + (endX - startX) * t
+        const cy = startY + (endY - startY) * t
+
+        const outside = getOutsideFactor(cx)
+        if (outside < 0.05) continue
+
+        const edgeFade = Math.sin((t - 0.3) / 0.4 * Math.PI)
+        const o = 0.04 * outside * edgeFade
+
+        const grad = ctx!.createRadialGradient(cx, cy, 0, cx, cy, bandWidth * 0.7)
+        grad.addColorStop(0, `rgba(190, 170, 130, ${o})`)
+        grad.addColorStop(0.4, `rgba(160, 145, 115, ${o * 0.4})`)
+        grad.addColorStop(1, 'rgba(130, 125, 120, 0)')
+
+        ctx!.beginPath()
+        ctx!.arc(cx, cy, bandWidth * 0.7, 0, Math.PI * 2)
+        ctx!.fillStyle = grad
+        ctx!.fill()
+      }
+
+      // 3) 진한 태양 코어 (랜덤 밝기, 없을 때도 있음)
+      const coreT = 0.5
+      const coreCx = startX + (endX - startX) * coreT
+      const coreCy = startY + (endY - startY) * coreT
+      const coreOutside = getOutsideFactor(coreCx)
+      if (coreOutside > 0.05 && sunIntensity > 0) {
+        const coreRadius = bandWidth * 0.5
+        const co = coreOutside * sunIntensity
+
+        // 넓은 후광 (주황/금빛)
+        const halo3 = ctx!.createRadialGradient(coreCx, coreCy, 0, coreCx, coreCy, coreRadius * 4)
+        halo3.addColorStop(0, `rgba(255, 200, 100, ${0.08 * co})`)
+        halo3.addColorStop(0.3, `rgba(255, 180, 80, ${0.04 * co})`)
+        halo3.addColorStop(0.6, `rgba(200, 150, 80, ${0.015 * co})`)
+        halo3.addColorStop(1, 'rgba(180, 140, 80, 0)')
+
+        ctx!.beginPath()
+        ctx!.arc(coreCx, coreCy, coreRadius * 4, 0, Math.PI * 2)
+        ctx!.fillStyle = halo3
+        ctx!.fill()
+
+        // 중간 후광 (따뜻한 백색)
+        const halo2 = ctx!.createRadialGradient(coreCx, coreCy, 0, coreCx, coreCy, coreRadius * 2)
+        halo2.addColorStop(0, `rgba(255, 240, 200, ${0.2 * co})`)
+        halo2.addColorStop(0.3, `rgba(255, 220, 160, ${0.1 * co})`)
+        halo2.addColorStop(0.7, `rgba(255, 200, 120, ${0.03 * co})`)
+        halo2.addColorStop(1, 'rgba(240, 180, 100, 0)')
+
+        ctx!.beginPath()
+        ctx!.arc(coreCx, coreCy, coreRadius * 2, 0, Math.PI * 2)
+        ctx!.fillStyle = halo2
+        ctx!.fill()
+
+        // 밝은 코어
+        const coreGrad = ctx!.createRadialGradient(coreCx, coreCy, 0, coreCx, coreCy, coreRadius)
+        coreGrad.addColorStop(0, `rgba(255, 255, 245, ${0.5 * co})`)
+        coreGrad.addColorStop(0.1, `rgba(255, 250, 230, ${0.35 * co})`)
+        coreGrad.addColorStop(0.3, `rgba(255, 235, 190, ${0.15 * co})`)
+        coreGrad.addColorStop(0.6, `rgba(255, 210, 150, ${0.06 * co})`)
+        coreGrad.addColorStop(1, 'rgba(255, 200, 130, 0)')
+
+        ctx!.beginPath()
+        ctx!.arc(coreCx, coreCy, coreRadius, 0, Math.PI * 2)
+        ctx!.fillStyle = coreGrad
+        ctx!.fill()
+
+        // 가장 밝은 점
+        const dotGrad = ctx!.createRadialGradient(coreCx, coreCy, 0, coreCx, coreCy, coreRadius * 0.15)
+        dotGrad.addColorStop(0, `rgba(255, 255, 255, ${0.7 * co})`)
+        dotGrad.addColorStop(0.5, `rgba(255, 255, 240, ${0.3 * co})`)
+        dotGrad.addColorStop(1, 'rgba(255, 250, 230, 0)')
+
+        ctx!.beginPath()
+        ctx!.arc(coreCx, coreCy, coreRadius * 0.15, 0, Math.PI * 2)
+        ctx!.fillStyle = dotGrad
+        ctx!.fill()
+      }
+
+      // 4) 별들 (가우시안 분포로 자연스럽게)
       for (const ms of milkyWayStars) {
         const t = ms.offset
         const cx = startX + (endX - startX) * t
         const cy = startY + (endY - startY) * t
 
-        const spreadDist = ms.spread * bandWidth * 0.8
-        const gaussFactor = Math.exp(-ms.spread * ms.spread * 2)
-
-        const x = cx + Math.cos(bandAngle) * spreadDist
-        const y = cy + Math.sin(bandAngle) * spreadDist
+        const spreadDist = ms.spread * bandWidth
+        const x = cx + Math.cos(bandAngle) * spreadDist + ms.jitterX
+        const y = cy + Math.sin(bandAngle) * spreadDist + ms.jitterY
 
         const outside = getOutsideFactor(x)
         if (outside < 0.05) continue
 
-        const twinkle = 0.6 + 0.4 * Math.sin(time * 0.008 * 60 + ms.twinkleOffset)
-        const opacity = ms.baseOpacity * twinkle * gaussFactor * outside
+        // 양 끝 페이드
+        const edgeFade = Math.sin(t * Math.PI)
+        // 중심에서 멀수록 어두움
+        const distFade = Math.exp(-ms.spread * ms.spread * 1.5)
+
+        const twinkle = 0.7 + 0.3 * Math.sin(time * 0.008 * 60 + ms.twinkleOffset)
+        const opacity = ms.baseOpacity * twinkle * distFade * edgeFade * outside
+
+        const r = Math.round(180 + ms.warm * 50)
+        const g = Math.round(185 + ms.warm * 25 - (1 - ms.warm) * 15)
+        const b = Math.round(210 - ms.warm * 70)
 
         ctx!.beginPath()
         ctx!.arc(x, y, ms.size, 0, Math.PI * 2)
-        ctx!.fillStyle = `rgba(200, 210, 240, ${opacity})`
+        ctx!.fillStyle = `rgba(${r}, ${g}, ${b}, ${opacity})`
         ctx!.fill()
       }
     }
@@ -368,12 +525,11 @@ export function Starfield() {
     function animate() {
       ctx!.clearRect(0, 0, canvas!.width, canvas!.height)
       const time = Date.now() * 0.001
+      const dark = isDarkRef.current
+      const starDim = dark ? 1 : 0.25 // 라이트 모드에서 별 은은하게
 
-      if (isDarkRef.current) {
-        // 은하수 (가장 뒤)
+      if (dark) {
         drawMilkyWay(time)
-
-        // 성운
         drawNebulae(time)
       }
 
@@ -381,7 +537,8 @@ export function Starfield() {
       for (const star of stars) {
         star.opacity =
           star.baseOpacity *
-          (0.5 + 0.5 * Math.sin(time * star.twinkleSpeed * 60 + star.twinkleOffset))
+          (0.5 + 0.5 * Math.sin(time * star.twinkleSpeed * 60 + star.twinkleOffset)) *
+          starDim
 
         const dx = star.x - mouse.x
         const dy = star.y - mouse.y
@@ -429,7 +586,6 @@ export function Starfield() {
         ctx!.fill()
       }
 
-      // 별똥별 (가장 위)
       drawShootingStars()
 
       animationId = requestAnimationFrame(animate)
@@ -447,8 +603,8 @@ export function Starfield() {
 
     resize()
     createStars()
-    createNebulae()
     createMilkyWay()
+    createNebulae()
     animate()
 
     window.addEventListener('resize', resize)
